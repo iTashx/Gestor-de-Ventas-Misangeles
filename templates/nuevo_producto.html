@@ -1,0 +1,354 @@
+{% extends "base.html" %}
+
+{% block title %}Nuevo Producto - Sistema de Gestión Mis Angeles{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="bi bi-plus-circle"></i> Nuevo Producto
+            </h2>
+            <a href="{{ url_for('productos') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Volver a Productos
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-box"></i> Información del Producto
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" id="productForm">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="codigo" class="form-label">
+                                <i class="bi bi-upc"></i> Código del Producto *
+                            </label>
+                            <input type="text" class="form-control" id="codigo" name="codigo" 
+                                   placeholder="Ej: H001, A001, AC001" required>
+                            <div class="form-text">Código único para identificar el producto</div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="nombre" class="form-label">
+                                <i class="bi bi-tag"></i> Nombre del Producto *
+                            </label>
+                            <input type="text" class="form-control" id="nombre" name="nombre" 
+                                   placeholder="Ej: Huevos, Arroz, Aceite" required>
+                            <div class="form-text">Nombre comercial del producto</div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="categoria" class="form-label">
+                                <i class="bi bi-tags"></i> Categoría
+                            </label>
+                            <select class="form-select" id="categoria" name="categoria">
+                                <option value="">Seleccionar categoría</option>
+                                <option value="Proteínas">Proteínas</option>
+                                <option value="Granos">Granos</option>
+                                <option value="Aceites">Aceites</option>
+                                <option value="Lácteos">Lácteos</option>
+                                <option value="Frutas">Frutas</option>
+                                <option value="Verduras">Verduras</option>
+                                <option value="Otros">Otros</option>
+                            </select>
+                            <div class="form-text">Categoría para organizar productos</div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="equivalencia" class="form-label">
+                                <i class="bi bi-arrow-repeat"></i> Equivalencia (unidades) *
+                            </label>
+                            <input type="number" class="form-control" id="equivalencia" name="equivalencia" 
+                                   value="1" min="1" required>
+                            <div class="form-text">Unidades por empaque mayor (ej: 30 huevos por cartón)</div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="precio_detal_usd" class="form-label">
+                                <i class="bi bi-currency-dollar"></i> Precio Detal USD *
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" id="precio_detal_usd" name="precio_detal_usd" 
+                                       step="0.01" min="0" placeholder="0.00" required>
+                            </div>
+                            <div class="form-text">Precio por unidad individual</div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="precio_mayor_usd" class="form-label">
+                                <i class="bi bi-currency-dollar"></i> Precio Mayor USD *
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" id="precio_mayor_usd" name="precio_mayor_usd" 
+                                       step="0.01" min="0" placeholder="0.00" required>
+                            </div>
+                            <div class="form-text">Precio por empaque mayor (por unidad del empaque)</div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="descripcion" class="form-label">
+                            <i class="bi bi-card-text"></i> Descripción
+                        </label>
+                        <textarea class="form-control" id="descripcion" name="descripcion" rows="3" 
+                                  placeholder="Descripción detallada del producto..."></textarea>
+                        <div class="form-text">Información adicional sobre el producto</div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="d-flex justify-content-between">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Crear Producto
+                        </button>
+                        <button type="reset" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-clockwise"></i> Limpiar Formulario
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <!-- Información de ayuda -->
+        <div class="card mb-3">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="bi bi-question-circle"></i> Ayuda
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <h6>📝 Código del Producto</h6>
+                    <p class="small text-muted">Usa un código único y fácil de recordar. Ejemplos:</p>
+                    <ul class="small text-muted">
+                        <li>H001 - Huevos</li>
+                        <li>A001 - Arroz</li>
+                        <li>AC001 - Aceite</li>
+                    </ul>
+                </div>
+                
+                <div class="mb-3">
+                    <h6>💰 Precios</h6>
+                    <p class="small text-muted">
+                        <strong>Precio Detal:</strong> Precio por unidad individual<br>
+                        <strong>Precio Mayor:</strong> Precio por unidad del empaque mayor
+                    </p>
+                </div>
+                
+                <div class="mb-3">
+                    <h6>📦 Equivalencia</h6>
+                    <p class="small text-muted">
+                        <strong>Ejemplo:</strong> Si un cartón tiene 30 huevos, la equivalencia es 30
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Ejemplo de producto -->
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="bi bi-lightbulb"></i> Ejemplo
+                </h6>
+            </div>
+            <div class="card-body">
+                <h6>🥚 Huevos</h6>
+                <ul class="small text-muted">
+                    <li><strong>Código:</strong> H001</li>
+                    <li><strong>Categoría:</strong> Proteínas</li>
+                    <li><strong>Equivalencia:</strong> 30 (huevos por cartón)</li>
+                    <li><strong>Precio Detal:</strong> $0.15 (por huevo)</li>
+                    <li><strong>Precio Mayor:</strong> $0.12 (por huevo en cartón)</li>
+                </ul>
+                <button class="btn btn-sm btn-outline-primary" onclick="fillExample()">
+                    <i class="bi bi-arrow-down-circle"></i> Usar Ejemplo
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Validación en tiempo real -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="bi bi-check-circle"></i> Validación
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <i class="bi bi-check-circle-fill text-success" id="codigoValid" style="display: none;"></i>
+                            <i class="bi bi-x-circle-fill text-danger" id="codigoInvalid" style="display: none;"></i>
+                            <h6>Código</h6>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <i class="bi bi-check-circle-fill text-success" id="nombreValid" style="display: none;"></i>
+                            <i class="bi bi-x-circle-fill text-danger" id="nombreInvalid" style="display: none;"></i>
+                            <h6>Nombre</h6>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <i class="bi bi-check-circle-fill text-success" id="precioValid" style="display: none;"></i>
+                            <i class="bi bi-x-circle-fill text-danger" id="precioInvalid" style="display: none;"></i>
+                            <h6>Precios</h6>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <i class="bi bi-check-circle-fill text-success" id="equivalenciaValid" style="display: none;"></i>
+                            <i class="bi bi-x-circle-fill text-danger" id="equivalenciaInvalid" style="display: none;"></i>
+                            <h6>Equivalencia</h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Llenar formulario con ejemplo
+    function fillExample() {
+        document.getElementById('codigo').value = 'H001';
+        document.getElementById('nombre').value = 'Huevos';
+        document.getElementById('categoria').value = 'Proteínas';
+        document.getElementById('equivalencia').value = '30';
+        document.getElementById('precio_detal_usd').value = '0.15';
+        document.getElementById('precio_mayor_usd').value = '0.12';
+        document.getElementById('descripcion').value = 'Huevos de gallina frescos';
+        
+        // Validar todos los campos
+        validateAllFields();
+    }
+    
+    // Validación en tiempo real
+    document.addEventListener('DOMContentLoaded', function() {
+        const codigoInput = document.getElementById('codigo');
+        const nombreInput = document.getElementById('nombre');
+        const precioDetalInput = document.getElementById('precio_detal_usd');
+        const precioMayorInput = document.getElementById('precio_mayor_usd');
+        const equivalenciaInput = document.getElementById('equivalencia');
+        
+        // Validar código
+        codigoInput.addEventListener('input', function() {
+            const value = this.value.trim();
+            const isValid = value.length >= 2 && /^[A-Z0-9]+$/.test(value);
+            
+            document.getElementById('codigoValid').style.display = isValid ? 'block' : 'none';
+            document.getElementById('codigoInvalid').style.display = isValid ? 'none' : 'block';
+            
+            this.classList.toggle('is-valid', isValid);
+            this.classList.toggle('is-invalid', !isValid && value.length > 0);
+        });
+        
+        // Validar nombre
+        nombreInput.addEventListener('input', function() {
+            const value = this.value.trim();
+            const isValid = value.length >= 2;
+            
+            document.getElementById('nombreValid').style.display = isValid ? 'block' : 'none';
+            document.getElementById('nombreInvalid').style.display = isValid ? 'none' : 'block';
+            
+            this.classList.toggle('is-valid', isValid);
+            this.classList.toggle('is-invalid', !isValid && value.length > 0);
+        });
+        
+        // Validar precios
+        function validatePrecios() {
+            const precioDetal = parseFloat(precioDetalInput.value);
+            const precioMayor = parseFloat(precioMayorInput.value);
+            const isValid = precioDetal > 0 && precioMayor > 0 && precioDetal >= precioMayor;
+            
+            document.getElementById('precioValid').style.display = isValid ? 'block' : 'none';
+            document.getElementById('precioInvalid').style.display = isValid ? 'none' : 'block';
+            
+            precioDetalInput.classList.toggle('is-valid', precioDetal > 0);
+            precioDetalInput.classList.toggle('is-invalid', precioDetal <= 0 && precioDetalInput.value.length > 0);
+            
+            precioMayorInput.classList.toggle('is-valid', precioMayor > 0);
+            precioMayorInput.classList.toggle('is-invalid', precioMayor <= 0 && precioMayorInput.value.length > 0);
+        }
+        
+        precioDetalInput.addEventListener('input', validatePrecios);
+        precioMayorInput.addEventListener('input', validatePrecios);
+        
+        // Validar equivalencia
+        equivalenciaInput.addEventListener('input', function() {
+            const value = parseInt(this.value);
+            const isValid = value >= 1;
+            
+            document.getElementById('equivalenciaValid').style.display = isValid ? 'block' : 'none';
+            document.getElementById('equivalenciaInvalid').style.display = isValid ? 'none' : 'block';
+            
+            this.classList.toggle('is-valid', isValid);
+            this.classList.toggle('is-invalid', !isValid && this.value.length > 0);
+        });
+        
+        // Validar formulario antes de enviar
+        document.getElementById('productForm').addEventListener('submit', function(e) {
+            if (!validateAllFields()) {
+                e.preventDefault();
+                alert('Por favor, completa todos los campos requeridos correctamente.');
+            }
+        });
+    });
+    
+    // Función para validar todos los campos
+    function validateAllFields() {
+        const codigo = document.getElementById('codigo').value.trim();
+        const nombre = document.getElementById('nombre').value.trim();
+        const precioDetal = parseFloat(document.getElementById('precio_detal_usd').value);
+        const precioMayor = parseFloat(document.getElementById('precio_mayor_usd').value);
+        const equivalencia = parseInt(document.getElementById('equivalencia').value);
+        
+        const isValid = codigo.length >= 2 && 
+                       nombre.length >= 2 && 
+                       precioDetal > 0 && 
+                       precioMayor > 0 && 
+                       precioDetal >= precioMayor && 
+                       equivalencia >= 1;
+        
+        return isValid;
+    }
+    
+    // Formatear números automáticamente
+    document.getElementById('precio_detal_usd').addEventListener('blur', function() {
+        const value = parseFloat(this.value);
+        if (!isNaN(value)) {
+            this.value = value.toFixed(2);
+        }
+    });
+    
+    document.getElementById('precio_mayor_usd').addEventListener('blur', function() {
+        const value = parseFloat(this.value);
+        if (!isNaN(value)) {
+            this.value = value.toFixed(2);
+        }
+    });
+</script>
+{% endblock %}

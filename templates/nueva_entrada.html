@@ -1,0 +1,358 @@
+{% extends "base.html" %}
+
+{% block title %}Nueva Entrada - Sistema de Gestión Mis Angeles{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="bi bi-arrow-down-circle"></i> Nueva Entrada de Inventario
+            </h2>
+            <a href="{{ url_for('entradas') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Volver a Entradas
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-plus-circle"></i> Registrar Entrada
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" id="entradaForm">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="codigo_producto" class="form-label">
+                                <i class="bi bi-upc"></i> Código del Producto *
+                            </label>
+                            <input type="text" class="form-control" id="codigo_producto" name="codigo_producto" 
+                                   placeholder="Ej: H001, A001" required>
+                            <div class="form-text">Ingresa el código del producto</div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="fecha" class="form-label">
+                                <i class="bi bi-calendar"></i> Fecha de Entrada *
+                            </label>
+                            <input type="date" class="form-control" id="fecha" name="fecha" 
+                                   value="{{ today }}" required>
+                            <div class="form-text">Fecha de la entrada</div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="tipo_entrada" class="form-label">
+                                <i class="bi bi-tags"></i> Tipo de Entrada *
+                            </label>
+                            <select class="form-select" id="tipo_entrada" name="tipo_entrada" required>
+                                <option value="">Seleccionar tipo</option>
+                                <option value="Mayor">Mayor</option>
+                                <option value="Detal">Detal</option>
+                            </select>
+                            <div class="form-text">Tipo de entrada (Mayor o Detal)</div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="cantidad" class="form-label">
+                                <i class="bi bi-123"></i> Cantidad *
+                            </label>
+                            <input type="number" class="form-control" id="cantidad" name="cantidad" 
+                                   step="0.01" min="0" placeholder="0" required>
+                            <div class="form-text">Cantidad a ingresar</div>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="d-flex justify-content-between">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Registrar Entrada
+                        </button>
+                        <button type="reset" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-clockwise"></i> Limpiar Formulario
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <!-- Información del producto -->
+        <div class="card mb-3">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="bi bi-info-circle"></i> Información del Producto
+                </h6>
+            </div>
+            <div class="card-body" id="productoInfo">
+                <div class="text-center py-3">
+                    <i class="bi bi-search fs-1 text-muted"></i>
+                    <p class="text-muted mt-2">Ingresa el código del producto para ver su información</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Cálculos automáticos -->
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="bi bi-calculator"></i> Cálculos Automáticos
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-2">
+                    <strong>Precio Unitario:</strong>
+                    <span id="precioUnitario">$0.00</span>
+                </div>
+                <div class="mb-2">
+                    <strong>Total USD:</strong>
+                    <span id="totalUSD">$0.00</span>
+                </div>
+                <div class="mb-2">
+                    <strong>Total BS:</strong>
+                    <span id="totalBS">Bs 0.00</span>
+                </div>
+                <hr>
+                <div class="text-center">
+                    <small class="text-muted">Los cálculos se actualizan automáticamente</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Lista de productos disponibles -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-list-ul"></i> Productos Disponibles
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if productos %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Producto</th>
+                                <th>Categoría</th>
+                                <th>Precio Detal USD</th>
+                                <th>Precio Mayor USD</th>
+                                <th>Equivalencia</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for producto in productos %}
+                            <tr>
+                                <td>
+                                    <span class="badge bg-primary">{{ producto.codigo }}</span>
+                                </td>
+                                <td>
+                                    <strong>{{ producto.nombre }}</strong>
+                                    {% if producto.descripcion %}
+                                    <br>
+                                    <small class="text-muted">{{ producto.descripcion }}</small>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if producto.categoria %}
+                                        <span class="badge bg-info">{{ producto.categoria }}</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Sin categoría</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <strong>${{ "%.2f"|format(producto.precio_detal_usd) }}</strong>
+                                </td>
+                                <td>
+                                    <strong>${{ "%.2f"|format(producto.precio_mayor_usd) }}</strong>
+                                </td>
+                                <td>
+                                    <span class="badge bg-warning">{{ producto.equivalencia }} u.</span>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary" 
+                                            onclick="seleccionarProducto('{{ producto.codigo }}', '{{ producto.nombre }}', {{ producto.precio_detal_usd }}, {{ producto.precio_mayor_usd }}, {{ producto.equivalencia }})">
+                                        <i class="bi bi-check"></i> Seleccionar
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="bi bi-inbox fs-1 text-muted"></i>
+                    <h5 class="text-muted mt-3">No hay productos registrados</h5>
+                    <p class="text-muted">Primero debes agregar productos al sistema.</p>
+                    <a href="{{ url_for('nuevo_producto') }}" class="btn btn-primary">
+                        <i class="bi bi-plus"></i> Agregar Producto
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    let productoSeleccionado = null;
+    const tasaCambio = {{ config.tasa_cambio }};
+    
+    // Seleccionar producto desde la tabla
+    function seleccionarProducto(codigo, nombre, precioDetal, precioMayor, equivalencia) {
+        document.getElementById('codigo_producto').value = codigo;
+        productoSeleccionado = {
+            codigo: codigo,
+            nombre: nombre,
+            precio_detal: precioDetal,
+            precio_mayor: precioMayor,
+            equivalencia: equivalencia
+        };
+        
+        mostrarInformacionProducto();
+        calcularTotales();
+    }
+    
+    // Mostrar información del producto
+    function mostrarInformacionProducto() {
+        const infoDiv = document.getElementById('productoInfo');
+        
+        if (productoSeleccionado) {
+            infoDiv.innerHTML = `
+                <div class="text-center">
+                    <i class="bi bi-box fs-1 text-primary mb-2"></i>
+                    <h6>${productoSeleccionado.nombre}</h6>
+                    <p class="text-muted small">Código: ${productoSeleccionado.codigo}</p>
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <small class="text-muted">Precio Detal</small><br>
+                            <strong>$${productoSeleccionado.precio_detal.toFixed(2)}</strong>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted">Precio Mayor</small><br>
+                            <strong>$${productoSeleccionado.precio_mayor.toFixed(2)}</strong>
+                        </div>
+                    </div>
+                    <div class="mt-2">
+                        <small class="text-muted">Equivalencia: ${productoSeleccionado.equivalencia} unidades</small>
+                    </div>
+                </div>
+            `;
+        } else {
+            infoDiv.innerHTML = `
+                <div class="text-center py-3">
+                    <i class="bi bi-search fs-1 text-muted"></i>
+                    <p class="text-muted mt-2">Ingresa el código del producto para ver su información</p>
+                </div>
+            `;
+        }
+    }
+    
+    // Calcular totales automáticamente
+    function calcularTotales() {
+        const cantidad = parseFloat(document.getElementById('cantidad').value) || 0;
+        const tipoEntrada = document.getElementById('tipo_entrada').value;
+        
+        if (productoSeleccionado && cantidad > 0 && tipoEntrada) {
+            let precioUnitario = 0;
+            
+            if (tipoEntrada === 'Mayor') {
+                precioUnitario = productoSeleccionado.precio_mayor;
+            } else {
+                precioUnitario = productoSeleccionado.precio_detal;
+            }
+            
+            const totalUSD = cantidad * precioUnitario;
+            const totalBS = totalUSD * tasaCambio;
+            
+            document.getElementById('precioUnitario').textContent = '$' + precioUnitario.toFixed(2);
+            document.getElementById('totalUSD').textContent = '$' + totalUSD.toFixed(2);
+            document.getElementById('totalBS').textContent = 'Bs ' + totalBS.toFixed(2);
+        } else {
+            document.getElementById('precioUnitario').textContent = '$0.00';
+            document.getElementById('totalUSD').textContent = '$0.00';
+            document.getElementById('totalBS').textContent = 'Bs 0.00';
+        }
+    }
+    
+    // Eventos para actualizar cálculos
+    document.addEventListener('DOMContentLoaded', function() {
+        const codigoInput = document.getElementById('codigo_producto');
+        const tipoSelect = document.getElementById('tipo_entrada');
+        const cantidadInput = document.getElementById('cantidad');
+        
+        // Buscar producto por código
+        codigoInput.addEventListener('blur', function() {
+            const codigo = this.value.trim();
+            if (codigo) {
+                // Simular búsqueda (en una implementación real sería AJAX)
+                const productos = {{ productos|tojson }};
+                const producto = productos.find(p => p.codigo.toLowerCase() === codigo.toLowerCase());
+                
+                if (producto) {
+                    productoSeleccionado = {
+                        codigo: producto.codigo,
+                        nombre: producto.nombre,
+                        precio_detal: producto.precio_detal_usd,
+                        precio_mayor: producto.precio_mayor_usd,
+                        equivalencia: producto.equivalencia
+                    };
+                    mostrarInformacionProducto();
+                    calcularTotales();
+                } else {
+                    alert('Producto no encontrado. Verifica el código.');
+                    this.focus();
+                }
+            }
+        });
+        
+        // Actualizar cálculos cuando cambien los campos
+        tipoSelect.addEventListener('change', calcularTotales);
+        cantidadInput.addEventListener('input', calcularTotales);
+        
+        // Validar formulario antes de enviar
+        document.getElementById('entradaForm').addEventListener('submit', function(e) {
+            if (!productoSeleccionado) {
+                e.preventDefault();
+                alert('Por favor, selecciona un producto válido.');
+                return;
+            }
+            
+            const cantidad = parseFloat(cantidadInput.value);
+            if (cantidad <= 0) {
+                e.preventDefault();
+                alert('La cantidad debe ser mayor a 0.');
+                return;
+            }
+            
+            if (!confirm('¿Estás seguro de que quieres registrar esta entrada?')) {
+                e.preventDefault();
+            }
+        });
+    });
+    
+    // Formatear números automáticamente
+    document.getElementById('cantidad').addEventListener('blur', function() {
+        const value = parseFloat(this.value);
+        if (!isNaN(value)) {
+            this.value = value.toFixed(2);
+        }
+    });
+</script>
+{% endblock %}

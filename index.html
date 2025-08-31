@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestión Misangeles</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#366092">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- SweetAlert2 -->
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #366092;
+            --secondary-color: #E7E6E6;
+            --success-color: #00B050;
+            --warning-color: #FFC000;
+            --danger-color: #C00000;
+            --info-color: #17a2b8;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 280px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, #1e3a8a 100%);
+            color: white;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            overflow-y: auto;
+        }
+
+        .sidebar.collapsed {
+            width: 70px;
+        }
+
+        .sidebar.collapsed .sidebar-brand,
+        .sidebar.collapsed .nav-link span {
+            display: none;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-logo {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            font-size: 24px;
+            color: var(--primary-color);
+        }
+
+        .sidebar-brand {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .nav-link {
+            color: rgba(255,255,255,0.8);
+            padding: 12px 15px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            margin: 2px 0;
+        }
+
+        .nav-link:hover {
+            color: white;
+            background: rgba(255,255,255,0.1);
+            transform: translateX(5px);
+        }
+
+        .nav-link.active {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+
+        .nav-link i {
+            margin-right: 12px;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            transition: all 0.3s ease;
+            min-height: 100vh;
+            background: #f8f9fa;
+        }
+
+        .main-content.expanded {
+            margin-left: 70px;
+        }
+
+        /* Top Navbar */
+        .top-navbar {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 10px;
+            margin: 20px;
+        }
+
+        .sidebar-toggle {
+            display: none;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        /* Cards */
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            margin-bottom: 25px;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #1e3a8a 100%);
+            color: white;
+            border-radius: 15px 15px 0 0 !important;
+            padding: 20px 25px;
+            border: none;
+        }
+
+        /* Buttons */
+        .btn {
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #1e3a8a 100%);
+            border: none;
+        }
+
+        /* Forms */
+        .form-control, .form-select {
+            border-radius: 8px;
+            border: 2px solid #e5e7eb;
+            padding: 12px 15px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(54, 96, 146, 0.25);
+        }
+
+        /* Tables */
+        .table {
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .table thead th {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #1e3a8a 100%);
+            color: white;
+            border: none;
+            padding: 15px;
+            font-weight: 600;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 280px;
+            }
+            
+            .sidebar.show {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding: 15px;
+            }
+            
+            .sidebar-toggle {
+                display: block;
+            }
+        }
+
+        /* Content Area */
+        .content-area {
+            padding: 20px;
+        }
+
+        /* Sections */
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        /* Dashboard Stats */
+        .stats-card {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #1e3a8a 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .stats-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .stats-label {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <i class="fas fa-store"></i>
+            </div>
+            <h5 class="sidebar-brand">Misangeles</h5>
+        </div>
+        
+        <ul class="sidebar-nav">
+            <li class="nav-item">
+                <a href="#dashboard" class="nav-link active" data-section="dashboard">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#productos" class="nav-link" data-section="productos">
+                    <i class="fas fa-box"></i>
+                    <span>Productos</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#entradas" class="nav-link" data-section="entradas">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>Entradas</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#ventas" class="nav-link" data-section="ventas">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Ventas</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#inventario" class="nav-link" data-section="inventario">
+                    <i class="fas fa-warehouse"></i>
+                    <span>Inventario</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#reportes" class="nav-link" data-section="reportes">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Reportes</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#configuracion" class="nav-link" data-section="configuracion">
+                    <i class="fas fa-cog"></i>
+                    <span>Configuración</span>
+                </a>
+            </li>
+            
+            <!-- Enlaces de contacto -->
+            <li class="nav-item mt-4">
+                <hr style="border-color: rgba(255,255,255,0.2); margin: 10px 15px;">
+            </li>
+            <li class="nav-item">
+                <a href="mailto:angeljrojasm@gmail.com" class="nav-link">
+                    <i class="fas fa-envelope"></i>
+                    <span>Contacto</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="https://github.com/angelrojas" target="_blank" class="nav-link">
+                    <i class="fab fa-github"></i>
+                    <span>GitHub</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <!-- Top Navbar -->
+        <nav class="top-navbar">
+            <div class="d-flex align-items-center">
+                <button class="sidebar-toggle me-3" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h4 class="mb-0" id="pageTitle">Dashboard</h4>
+            </div>
+            <div class="d-flex align-items-center">
+                <span class="text-muted me-3">Sistema Misangeles</span>
+                <div class="dropdown">
+                    <button class="btn btn-outline-primary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-user"></i>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#configuracion"><i class="fas fa-cog me-2"></i>Configuración</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="mailto:angeljrojasm@gmail.com"><i class="fas fa-envelope me-2"></i>Contacto</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Content Area -->
+        <div class="content-area">
+            <!-- Dashboard Section -->
+            <div id="dashboard" class="section active">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="stats-card">
+                            <div class="stats-number" id="totalProductos">0</div>
+                            <div class="stats-label">Productos</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stats-card">
+                            <div class="stats-number" id="totalVentas">0</div>
+                            <div class="stats-label">Ventas Hoy</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stats-card">
+                            <div class="stats-number" id="totalInventario">$0</div>
+                            <div class="stats-label">Valor Inventario</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stats-card">
+                            <div class="stats-number" id="totalEntradas">0</div>
+                            <div class="stats-label">Entradas Hoy</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Productos Recientes</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="productosRecientes">
+                                    <p class="text-muted">No hay productos registrados</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Ventas Recientes</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="ventasRecientes">
+                                    <p class="text-muted">No hay ventas registradas</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Productos Section -->
+            <div id="productos" class="section">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">Gestión de Productos</h5>
+                        <button class="btn btn-success" onclick="showNuevoProducto()">
+                            <i class="fas fa-plus"></i> Nuevo Producto
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Código</th>
+                                        <th>Nombre</th>
+                                        <th>Categoría</th>
+                                        <th>Precio Detal (USD)</th>
+                                        <th>Precio Mayor (USD)</th>
+                                        <th>Equivalencia</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="productosTable">
+                                    <tr>
+                                        <td colspan="7" class="text-center text-muted">No hay productos registrados</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Entradas Section -->
+            <div id="entradas" class="section">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">Entradas de Inventario</h5>
+                        <button class="btn btn-success" onclick="showNuevaEntrada()">
+                            <i class="fas fa-plus"></i> Nueva Entrada
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Producto</th>
+                                        <th>Tipo</th>
+                                        <th>Cantidad</th>
+                                        <th>Precio Unitario (USD)</th>
+                                        <th>Total (USD)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="entradasTable">
+                                    <tr>
+                                        <td colspan="6" class="text-center text-muted">No hay entradas registradas</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ventas Section -->
+            <div id="ventas" class="section">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">Ventas</h5>
+                        <button class="btn btn-success" onclick="showNuevaVenta()">
+                            <i class="fas fa-plus"></i> Nueva Venta
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Producto</th>
+                                        <th>Tipo</th>
+                                        <th>Cantidad</th>
+                                        <th>Total con IVA (USD)</th>
+                                        <th>Total (BS)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ventasTable">
+                                    <tr>
+                                        <td colspan="6" class="text-center text-muted">No hay ventas registradas</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Inventario Section -->
+            <div id="inventario" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Inventario Actual</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Código</th>
+                                        <th>Producto</th>
+                                        <th>Stock Mayor</th>
+                                        <th>Stock Unidades</th>
+                                        <th>Valor (USD)</th>
+                                        <th>Valor (BS)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="inventarioTable">
+                                    <tr>
+                                        <td colspan="6" class="text-center text-muted">No hay productos en inventario</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reportes Section -->
+            <div id="reportes" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Reportes</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h6>Ventas del Mes</h6>
+                                        <div class="stats-number" id="ventasMes">0</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h6>Total Ventas (USD)</h6>
+                                        <div class="stats-number" id="totalVentasUSD">$0</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <button class="btn btn-primary" onclick="exportarExcel()">
+                                <i class="fas fa-download"></i> Exportar a Excel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Configuración Section -->
+            <div id="configuracion" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Configuración del Sistema</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="configForm">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Tasa de Cambio (USD a BS)</label>
+                                        <input type="number" class="form-control" id="tasaCambio" value="35.50" step="0.01">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">IVA (%)</label>
+                                        <input type="number" class="form-control" id="ivaPorcentaje" value="30" step="0.1">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Nombre de la Empresa</label>
+                                <input type="text" class="form-control" id="nombreEmpresa" value="Misangeles">
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Guardar Configuración
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <script>
+        // Datos de la aplicación
+        let productos = [];
+        let entradas = [];
+        let ventas = [];
+        let configuracion = {
+            tasa_cambio: 35.50,
+            iva_porcentaje: 30,
+            nombre_empresa: 'Misangeles'
+        };
+
+        // Cargar datos desde localStorage
+        function cargarDatos() {
+            productos = JSON.parse(localStorage.getItem('productos') || '[]');
+            entradas = JSON.parse(localStorage.getItem('entradas') || '[]');
+            ventas = JSON.parse(localStorage.getItem('ventas') || '[]');
+            configuracion = JSON.parse(localStorage.getItem('configuracion') || JSON.stringify(configuracion));
+            
+            actualizarDashboard();
+            actualizarTablas();
+        }
+
+        // Guardar datos en localStorage
+        function guardarDatos() {
+            localStorage.setItem('productos', JSON.stringify(productos));
+            localStorage.setItem('entradas', JSON.stringify(entradas));
+            localStorage.setItem('ventas', JSON.stringify(ventas));
+            localStorage.setItem('configuracion', JSON.stringify(configuracion));
+        }
+
+        // Navegación
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const section = this.getAttribute('data-section');
+                if (section) {
+                    mostrarSeccion(section);
+                }
+            });
+        });
+
+        function mostrarSeccion(seccion) {
+            // Ocultar todas las secciones
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            
+            // Mostrar la sección seleccionada
+            document.getElementById(seccion).classList.add('active');
+            
+            // Actualizar navegación activa
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            document.querySelector(`[data-section="${seccion}"]`).classList.add('active');
+            
+            // Actualizar título
+            document.getElementById('pageTitle').textContent = 
+                seccion.charAt(0).toUpperCase() + seccion.slice(1);
+        }
+
+        // Sidebar toggle
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('mainContent');
+            
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('expanded');
+        }
+
+        // Actualizar dashboard
+        function actualizarDashboard() {
+            const hoy = new Date().toISOString().split('T')[0];
+            
+            document.getElementById('totalProductos').textContent = productos.length;
+            document.getElementById('totalVentas').textContent = 
+                ventas.filter(v => v.fecha === hoy).length;
+            document.getElementById('totalEntradas').textContent = 
+                entradas.filter(e => e.fecha === hoy).length;
+            
+            // Calcular valor del inventario
+            let totalInventario = 0;
+            productos.forEach(producto => {
+                const stock = calcularStockProducto(producto.id);
+                totalInventario += stock.valor_usd;
+            });
+            document.getElementById('totalInventario').textContent = `$${totalInventario.toFixed(2)}`;
+        }
+
+        // Calcular stock de un producto
+        function calcularStockProducto(productoId) {
+            const producto = productos.find(p => p.id === productoId);
+            if (!producto) return { stock_mayor: 0, stock_unidades: 0, valor_usd: 0 };
+            
+            // Calcular entradas
+            const entradasMayor = entradas
+                .filter(e => e.producto_id === productoId && e.tipo_entrada === 'Mayor')
+                .reduce((sum, e) => sum + e.cantidad, 0);
+            
+            const entradasDetal = entradas
+                .filter(e => e.producto_id === productoId && e.tipo_entrada === 'Detal')
+                .reduce((sum, e) => sum + e.cantidad, 0);
+            
+            // Calcular ventas
+            const ventasMayor = ventas
+                .filter(v => v.producto_id === productoId && v.tipo_venta === 'Mayor')
+                .reduce((sum, v) => sum + v.cantidad, 0);
+            
+            const ventasDetal = ventas
+                .filter(v => v.producto_id === productoId && v.tipo_venta === 'Detal')
+                .reduce((sum, v) => sum + v.cantidad, 0);
+            
+            // Calcular stock
+            const stockMayor = entradasMayor - ventasMayor;
+            const stockUnidades = (entradasMayor * producto.equivalencia + entradasDetal) - ventasDetal;
+            
+            // Calcular valor
+            const valorUSD = (stockMayor * producto.precio_mayor_usd) + (stockUnidades * producto.precio_detal_usd);
+            
+            return {
+                stock_mayor: stockMayor,
+                stock_unidades: stockUnidades,
+                valor_usd: valorUSD
+            };
+        }
+
+        // Actualizar tablas
+        function actualizarTablas() {
+            actualizarTablaProductos();
+            actualizarTablaEntradas();
+            actualizarTablaVentas();
+            actualizarTablaInventario();
+        }
+
+        function actualizarTablaProductos() {
+            const tbody = document.getElementById('productosTable');
+            if (productos.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No hay productos registrados</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = productos.map(producto => `
+                <tr>
+                    <td>${producto.codigo}</td>
+                    <td>${producto.nombre}</td>
+                    <td>${producto.categoria}</td>
+                    <td>$${producto.precio_detal_usd}</td>
+                    <td>$${producto.precio_mayor_usd}</td>
+                    <td>${producto.equivalencia}</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" onclick="editarProducto(${producto.id})">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="eliminarProducto(${producto.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function actualizarTablaEntradas() {
+            const tbody = document.getElementById('entradasTable');
+            if (entradas.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No hay entradas registradas</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = entradas.map(entrada => {
+                const producto = productos.find(p => p.id === entrada.producto_id);
+                return `
+                    <tr>
+                        <td>${entrada.fecha}</td>
+                        <td>${producto ? producto.nombre : 'N/A'}</td>
+                        <td>${entrada.tipo_entrada}</td>
+                        <td>${entrada.cantidad}</td>
+                        <td>$${entrada.precio_unitario_usd}</td>
+                        <td>$${entrada.total_usd}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function actualizarTablaVentas() {
+            const tbody = document.getElementById('ventasTable');
+            if (ventas.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No hay ventas registradas</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = ventas.map(venta => {
+                const producto = productos.find(p => p.id === venta.producto_id);
+                return `
+                    <tr>
+                        <td>${venta.fecha}</td>
+                        <td>${producto ? producto.nombre : 'N/A'}</td>
+                        <td>${venta.tipo_venta}</td>
+                        <td>${venta.cantidad}</td>
+                        <td>$${venta.total_con_iva_usd}</td>
+                        <td>${venta.total_bs} BS</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function actualizarTablaInventario() {
+            const tbody = document.getElementById('inventarioTable');
+            if (productos.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No hay productos en inventario</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = productos.map(producto => {
+                const stock = calcularStockProducto(producto.id);
+                return `
+                    <tr>
+                        <td>${producto.codigo}</td>
+                        <td>${producto.nombre}</td>
+                        <td>${stock.stock_mayor}</td>
+                        <td>${stock.stock_unidades}</td>
+                        <td>$${stock.valor_usd.toFixed(2)}</td>
+                        <td>${(stock.valor_usd * configuracion.tasa_cambio).toFixed(2)} BS</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Funciones para agregar datos
+        function showNuevoProducto() {
+            Swal.fire({
+                title: 'Nuevo Producto',
+                html: `
+                    <input id="codigo" class="swal2-input" placeholder="Código">
+                    <input id="nombre" class="swal2-input" placeholder="Nombre">
+                    <input id="categoria" class="swal2-input" placeholder="Categoría">
+                    <input id="precioDetal" class="swal2-input" type="number" step="0.01" placeholder="Precio Detal (USD)">
+                    <input id="precioMayor" class="swal2-input" type="number" step="0.01" placeholder="Precio Mayor (USD)">
+                    <input id="equivalencia" class="swal2-input" type="number" placeholder="Equivalencia">
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Guardar',
+                cancelButtonText: 'Cancelar',
+                preConfirm: () => {
+                    const codigo = document.getElementById('codigo').value;
+                    const nombre = document.getElementById('nombre').value;
+                    const categoria = document.getElementById('categoria').value;
+                    const precioDetal = parseFloat(document.getElementById('precioDetal').value);
+                    const precioMayor = parseFloat(document.getElementById('precioMayor').value);
+                    const equivalencia = parseInt(document.getElementById('equivalencia').value);
+                    
+                    if (!codigo || !nombre || !precioDetal || !precioMayor) {
+                        Swal.showValidationMessage('Por favor completa todos los campos');
+                        return false;
+                    }
+                    
+                    return { codigo, nombre, categoria, precioDetal, precioMayor, equivalencia };
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const nuevoProducto = {
+                        id: Date.now(),
+                        codigo: result.value.codigo,
+                        nombre: result.value.nombre,
+                        categoria: result.value.categoria,
+                        precio_detal_usd: result.value.precioDetal,
+                        precio_mayor_usd: result.value.precioMayor,
+                        equivalencia: result.value.equivalencia || 1
+                    };
+                    
+                    productos.push(nuevoProducto);
+                    guardarDatos();
+                    actualizarDashboard();
+                    actualizarTablas();
+                    
+                    Swal.fire('¡Éxito!', 'Producto agregado correctamente', 'success');
+                }
+            });
+        }
+
+        function showNuevaEntrada() {
+            if (productos.length === 0) {
+                Swal.fire('Error', 'Primero debes agregar productos', 'error');
+                return;
+            }
+            
+            Swal.fire({
+                title: 'Nueva Entrada',
+                html: `
+                    <select id="productoSelect" class="swal2-input">
+                        <option value="">Seleccionar producto</option>
+                        ${productos.map(p => `<option value="${p.id}">${p.codigo} - ${p.nombre}</option>`).join('')}
+                    </select>
+                    <select id="tipoEntrada" class="swal2-input">
+                        <option value="Mayor">Mayor</option>
+                        <option value="Detal">Detal</option>
+                    </select>
+                    <input id="cantidad" class="swal2-input" type="number" step="0.01" placeholder="Cantidad">
+                    <input id="precioUnitario" class="swal2-input" type="number" step="0.01" placeholder="Precio unitario (USD)">
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Guardar',
+                cancelButtonText: 'Cancelar',
+                preConfirm: () => {
+                    const productoId = parseInt(document.getElementById('productoSelect').value);
+                    const tipoEntrada = document.getElementById('tipoEntrada').value;
+                    const cantidad = parseFloat(document.getElementById('cantidad').value);
+                    const precioUnitario = parseFloat(document.getElementById('precioUnitario').value);
+                    
+                    if (!productoId || !cantidad || !precioUnitario) {
+                        Swal.showValidationMessage('Por favor completa todos los campos');
+                        return false;
+                    }
+                    
+                    return { productoId, tipoEntrada, cantidad, precioUnitario };
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const nuevaEntrada = {
+                        id: Date.now(),
+                        fecha: new Date().toISOString().split('T')[0],
+                        producto_id: result.value.productoId,
+                        tipo_entrada: result.value.tipoEntrada,
+                        cantidad: result.value.cantidad,
+                        precio_unitario_usd: result.value.precioUnitario,
+                        total_usd: result.value.cantidad * result.value.precioUnitario
+                    };
+                    
+                    entradas.push(nuevaEntrada);
+                    guardarDatos();
+                    actualizarDashboard();
+                    actualizarTablas();
+                    
+                    Swal.fire('¡Éxito!', 'Entrada registrada correctamente', 'success');
+                }
+            });
+        }
+
+        function showNuevaVenta() {
+            if (productos.length === 0) {
+                Swal.fire('Error', 'Primero debes agregar productos', 'error');
+                return;
+            }
+            
+            Swal.fire({
+                title: 'Nueva Venta',
+                html: `
+                    <select id="productoVentaSelect" class="swal2-input">
+                        <option value="">Seleccionar producto</option>
+                        ${productos.map(p => `<option value="${p.id}">${p.codigo} - ${p.nombre}</option>`).join('')}
+                    </select>
+                    <select id="tipoVenta" class="swal2-input">
+                        <option value="Mayor">Mayor</option>
+                        <option value="Detal">Detal</option>
+                    </select>
+                    <input id="cantidadVenta" class="swal2-input" type="number" step="0.01" placeholder="Cantidad">
+                    <input id="precioUnitarioVenta" class="swal2-input" type="number" step="0.01" placeholder="Precio unitario (USD)">
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Guardar',
+                cancelButtonText: 'Cancelar',
+                preConfirm: () => {
+                    const productoId = parseInt(document.getElementById('productoVentaSelect').value);
+                    const tipoVenta = document.getElementById('tipoVenta').value;
+                    const cantidad = parseFloat(document.getElementById('cantidadVenta').value);
+                    const precioUnitario = parseFloat(document.getElementById('precioUnitarioVenta').value);
+                    
+                    if (!productoId || !cantidad || !precioUnitario) {
+                        Swal.showValidationMessage('Por favor completa todos los campos');
+                        return false;
+                    }
+                    
+                    return { productoId, tipoVenta, cantidad, precioUnitario };
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const subtotal = result.value.cantidad * result.value.precioUnitario;
+                    const iva = subtotal * (configuracion.iva_porcentaje / 100);
+                    const totalConIva = subtotal + iva;
+                    const totalBS = totalConIva * configuracion.tasa_cambio;
+                    
+                    const nuevaVenta = {
+                        id: Date.now(),
+                        fecha: new Date().toISOString().split('T')[0],
+                        producto_id: result.value.productoId,
+                        tipo_venta: result.value.tipoVenta,
+                        cantidad: result.value.cantidad,
+                        precio_unitario_usd: result.value.precioUnitario,
+                        total_sin_iva_usd: subtotal,
+                        iva_usd: iva,
+                        total_con_iva_usd: totalConIva,
+                        total_bs: totalBS
+                    };
+                    
+                    ventas.push(nuevaVenta);
+                    guardarDatos();
+                    actualizarDashboard();
+                    actualizarTablas();
+                    
+                    Swal.fire('¡Éxito!', 'Venta registrada correctamente', 'success');
+                }
+            });
+        }
+
+        // Configuración
+        document.getElementById('configForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            configuracion.tasa_cambio = parseFloat(document.getElementById('tasaCambio').value);
+            configuracion.iva_porcentaje = parseFloat(document.getElementById('ivaPorcentaje').value);
+            configuracion.nombre_empresa = document.getElementById('nombreEmpresa').value;
+            
+            guardarDatos();
+            actualizarTablas();
+            
+            Swal.fire('¡Éxito!', 'Configuración guardada correctamente', 'success');
+        });
+
+        // Exportar a Excel
+        function exportarExcel() {
+            // Crear datos para exportar
+            const datos = productos.map(producto => {
+                const stock = calcularStockProducto(producto.id);
+                return {
+                    'Código': producto.codigo,
+                    'Nombre': producto.nombre,
+                    'Categoría': producto.categoria,
+                    'Stock Mayor': stock.stock_mayor,
+                    'Stock Unidades': stock.stock_unidades,
+                    'Valor USD': stock.valor_usd.toFixed(2),
+                    'Valor BS': (stock.valor_usd * configuracion.tasa_cambio).toFixed(2)
+                };
+            });
+            
+            // Crear CSV
+            const headers = Object.keys(datos[0] || {});
+            const csv = [
+                headers.join(','),
+                ...datos.map(row => headers.map(header => row[header]).join(','))
+            ].join('\n');
+            
+            // Descargar archivo
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `inventario_misangeles_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+            
+            Swal.fire('¡Éxito!', 'Archivo exportado correctamente', 'success');
+        }
+
+        // Inicializar aplicación
+        document.addEventListener('DOMContentLoaded', function() {
+            cargarDatos();
+            
+            // Cargar configuración en el formulario
+            document.getElementById('tasaCambio').value = configuracion.tasa_cambio;
+            document.getElementById('ivaPorcentaje').value = configuracion.iva_porcentaje;
+            document.getElementById('nombreEmpresa').value = configuracion.nombre_empresa;
+        });
+    </script>
+</body>
+</html>

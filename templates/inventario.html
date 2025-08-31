@@ -1,0 +1,406 @@
+{% extends "base.html" %}
+
+{% block title %}Inventario - Sistema de Gestión Mis Angeles{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="bi bi-clipboard-data"></i> Inventario Actual
+            </h2>
+            <div>
+                <a href="{{ url_for('exportar_excel') }}" class="btn btn-success">
+                    <i class="bi bi-download"></i> Exportar Excel
+                </a>
+                <a href="{{ url_for('nueva_entrada') }}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle"></i> Nueva Entrada
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Resumen del inventario -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title">Productos con Stock</h6>
+                        <h3 class="mb-0">{{ inventario|length }}</h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-boxes fs-1"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title">Valor Total USD</h6>
+                        <h3 class="mb-0">${{ "%.2f"|format(total_inventario_usd) }}</h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-currency-dollar fs-1"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title">Valor Total BS</h6>
+                        <h3 class="mb-0">Bs {{ "%.2f"|format(total_inventario_bs) }}</h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-currency-exchange fs-1"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title">Última Actualización</h6>
+                        <h3 class="mb-0">{{ "AHORA" }}</h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-clock fs-1"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filtros -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <label for="searchInput" class="form-label">
+                            <i class="bi bi-search"></i> Buscar Producto
+                        </label>
+                        <input type="text" class="form-control" id="searchInput" 
+                               placeholder="Código, nombre o descripción...">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="categoryFilter" class="form-label">
+                            <i class="bi bi-tags"></i> Categoría
+                        </label>
+                        <select class="form-select" id="categoryFilter">
+                            <option value="">Todas las categorías</option>
+                            <option value="Proteínas">Proteínas</option>
+                            <option value="Granos">Granos</option>
+                            <option value="Aceites">Aceites</option>
+                            <option value="Lácteos">Lácteos</option>
+                            <option value="Frutas">Frutas</option>
+                            <option value="Verduras">Verduras</option>
+                            <option value="Otros">Otros</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="stockFilter" class="form-label">
+                            <i class="bi bi-clipboard-data"></i> Filtro de Stock
+                        </label>
+                        <select class="form-select" id="stockFilter">
+                            <option value="">Todos</option>
+                            <option value="con_stock">Con Stock</option>
+                            <option value="sin_stock">Sin Stock</option>
+                            <option value="bajo_stock">Stock Bajo</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">&nbsp;</label>
+                        <div class="d-grid">
+                            <button class="btn btn-outline-secondary" onclick="clearFilters()">
+                                <i class="bi bi-arrow-clockwise"></i> Limpiar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tabla de inventario -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-table"></i> Inventario Detallado
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if inventario %}
+                <div class="table-responsive">
+                    <table class="table table-hover" id="inventarioTable">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Producto</th>
+                                <th>Categoría</th>
+                                <th>Stock Mayor</th>
+                                <th>Stock Unidades</th>
+                                <th>Valor USD</th>
+                                <th>Valor BS</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in inventario %}
+                            <tr class="inventario-row" 
+                                data-codigo="{{ item.producto.codigo|lower }}"
+                                data-nombre="{{ item.producto.nombre|lower }}"
+                                data-descripcion="{{ item.producto.descripcion|lower if item.producto.descripcion else '' }}"
+                                data-categoria="{{ item.producto.categoria|lower if item.producto.categoria else '' }}"
+                                data-stock-mayor="{{ item.stock.stock_mayor }}"
+                                data-stock-unidades="{{ item.stock.stock_unidades }}">
+                                <td>
+                                    <span class="badge bg-primary">{{ item.producto.codigo }}</span>
+                                </td>
+                                <td>
+                                    <strong>{{ item.producto.nombre }}</strong>
+                                    {% if item.producto.descripcion %}
+                                    <br>
+                                    <small class="text-muted">{{ item.producto.descripcion }}</small>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if item.producto.categoria %}
+                                        <span class="badge bg-info">{{ item.producto.categoria }}</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Sin categoría</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if item.stock.stock_mayor > 0 %}
+                                        <span class="badge bg-success">{{ "%.0f"|format(item.stock.stock_mayor) }}</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">0</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if item.stock.stock_unidades > 0 %}
+                                        <span class="badge bg-info">{{ "%.0f"|format(item.stock.stock_unidades) }}</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">0</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <strong>${{ "%.2f"|format(item.stock.valor_usd) }}</strong>
+                                </td>
+                                <td>
+                                    <strong>Bs {{ "%.2f"|format(item.stock.valor_bs) }}</strong>
+                                </td>
+                                <td>
+                                    {% if item.stock.stock_mayor > 0 or item.stock.stock_unidades > 0 %}
+                                        <span class="badge bg-success">En Stock</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Sin Stock</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{{ url_for('nueva_entrada') }}?producto={{ item.producto.codigo }}" 
+                                           class="btn btn-outline-success" title="Agregar Stock">
+                                            <i class="bi bi-plus-circle"></i>
+                                        </a>
+                                        <a href="{{ url_for('nueva_venta') }}?producto={{ item.producto.codigo }}" 
+                                           class="btn btn-outline-warning" title="Vender">
+                                            <i class="bi bi-arrow-up-circle"></i>
+                                        </a>
+                                        <button class="btn btn-outline-info" 
+                                                onclick="showProductDetails('{{ item.producto.codigo }}')" 
+                                                title="Ver Detalles">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-inbox fs-1 text-muted"></i>
+                    <h5 class="text-muted mt-3">No hay productos con stock</h5>
+                    <p class="text-muted">Agrega productos y registra entradas para ver el inventario aquí.</p>
+                    <div class="d-flex justify-content-center gap-2">
+                        <a href="{{ url_for('nuevo_producto') }}" class="btn btn-primary">
+                            <i class="bi bi-plus"></i> Agregar Producto
+                        </a>
+                        <a href="{{ url_for('nueva_entrada') }}" class="btn btn-success">
+                            <i class="bi bi-arrow-down-circle"></i> Nueva Entrada
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para detalles del producto -->
+<div class="modal fade" id="productDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-info-circle"></i> Detalles del Producto
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="productDetailsContent">
+                <!-- Contenido dinámico -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <a href="#" class="btn btn-primary" id="editProductBtn">
+                    <i class="bi bi-pencil"></i> Editar Producto
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Búsqueda y filtros
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchInput');
+        const categoryFilter = document.getElementById('categoryFilter');
+        const stockFilter = document.getElementById('stockFilter');
+        
+        // Función de filtrado
+        function filterInventory() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const categoryTerm = categoryFilter.value.toLowerCase();
+            const stockTerm = stockFilter.value;
+            
+            const rows = document.querySelectorAll('.inventario-row');
+            let visibleCount = 0;
+            
+            rows.forEach(row => {
+                const codigo = row.dataset.codigo;
+                const nombre = row.dataset.nombre;
+                const descripcion = row.dataset.descripcion;
+                const categoria = row.dataset.categoria;
+                const stockMayor = parseFloat(row.dataset.stockMayor);
+                const stockUnidades = parseFloat(row.dataset.stockUnidades);
+                
+                let showRow = true;
+                
+                // Filtro de búsqueda
+                if (searchTerm) {
+                    showRow = codigo.includes(searchTerm) || 
+                             nombre.includes(searchTerm) || 
+                             descripcion.includes(searchTerm);
+                }
+                
+                // Filtro de categoría
+                if (categoryTerm && showRow) {
+                    showRow = categoria.includes(categoryTerm);
+                }
+                
+                // Filtro de stock
+                if (stockTerm && showRow) {
+                    const totalStock = stockMayor + stockUnidades;
+                    switch(stockTerm) {
+                        case 'con_stock':
+                            showRow = totalStock > 0;
+                            break;
+                        case 'sin_stock':
+                            showRow = totalStock === 0;
+                            break;
+                        case 'bajo_stock':
+                            showRow = totalStock > 0 && totalStock <= 10;
+                            break;
+                    }
+                }
+                
+                row.style.display = showRow ? '' : 'none';
+                if (showRow) visibleCount++;
+            });
+        }
+        
+        // Eventos de filtrado
+        searchInput.addEventListener('input', filterInventory);
+        categoryFilter.addEventListener('change', filterInventory);
+        stockFilter.addEventListener('change', filterInventory);
+    });
+    
+    // Limpiar filtros
+    function clearFilters() {
+        document.getElementById('searchInput').value = '';
+        document.getElementById('categoryFilter').value = '';
+        document.getElementById('stockFilter').value = '';
+        
+        const rows = document.querySelectorAll('.inventario-row');
+        rows.forEach(row => row.style.display = '');
+    }
+    
+    // Mostrar detalles del producto
+    function showProductDetails(codigo) {
+        // Por ahora, mostrar información básica
+        // En una implementación completa, haríamos una llamada AJAX
+        const modal = new bootstrap.Modal(document.getElementById('productDetailsModal'));
+        const content = document.getElementById('productDetailsContent');
+        
+        content.innerHTML = `
+            <div class="text-center">
+                <i class="bi bi-box fs-1 text-primary mb-3"></i>
+                <h5>Detalles del Producto: ${codigo}</h5>
+                <p class="text-muted">Función en desarrollo. Por ahora, usa los enlaces de acciones para gestionar el producto.</p>
+            </div>
+        `;
+        
+        modal.show();
+    }
+    
+    // Actualizar inventario automáticamente
+    setInterval(function() {
+        // En una implementación completa, haríamos una llamada AJAX para actualizar
+        console.log('Actualizando inventario...');
+    }, 30000); // Cada 30 segundos
+    
+    // Formatear números en tiempo real
+    document.addEventListener('DOMContentLoaded', function() {
+        // Formatear valores monetarios
+        const usdElements = document.querySelectorAll('strong');
+        usdElements.forEach(element => {
+            if (element.textContent.includes('$')) {
+                const value = parseFloat(element.textContent.replace('$', ''));
+                if (!isNaN(value)) {
+                    element.textContent = '$' + value.toLocaleString('es-VE', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

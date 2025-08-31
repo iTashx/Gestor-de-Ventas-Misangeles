@@ -1,0 +1,419 @@
+{% extends "base.html" %}
+
+{% block title %}Nueva Venta - Sistema Mis Angeles{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-shopping-cart text-success"></i> Nueva Venta</h2>
+                <a href="{{ url_for('ventas') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left"></i> Volver a Ventas
+                </a>
+            </div>
+
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-plus"></i> Registrar Nueva Venta</h5>
+                </div>
+                <div class="card-body">
+                    <form id="formVenta" method="POST">
+                        <div class="row">
+                            <!-- Información del Producto -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="codigo" class="form-label">Código del Producto *</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="codigo" name="codigo" 
+                                               required placeholder="Ej: PROD001" list="productosList">
+                                        <button type="button" class="btn btn-outline-secondary" onclick="buscarProducto()">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                    </div>
+                                    <datalist id="productosList">
+                                        {% for producto in productos %}
+                                        <option value="{{ producto.codigo }}">{{ producto.nombre }}</option>
+                                        {% endfor %}
+                                    </datalist>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="fecha" class="form-label">Fecha de Venta *</label>
+                                    <input type="date" class="form-control" id="fecha" name="fecha" 
+                                           value="{{ today }}" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="tipo_venta" class="form-label">Tipo de Venta *</label>
+                                    <select class="form-select" id="tipo_venta" name="tipo_venta" required>
+                                        <option value="">Seleccionar tipo...</option>
+                                        <option value="Mayor">Mayor</option>
+                                        <option value="Detal">Detal</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Información del Producto Seleccionado -->
+                            <div class="col-md-6">
+                                <div class="card bg-light">
+                                    <div class="card-header">
+                                        <h6 class="mb-0"><i class="fas fa-info-circle"></i> Información del Producto</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <small class="text-muted">Nombre:</small>
+                                                <p id="nombreProducto" class="mb-2">-</p>
+                                            </div>
+                                            <div class="col-6">
+                                                <small class="text-muted">Categoría:</small>
+                                                <p id="categoriaProducto" class="mb-2">-</p>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <small class="text-muted">Precio Mayor (USD):</small>
+                                                <p id="precioMayor" class="mb-2">-</p>
+                                            </div>
+                                            <div class="col-6">
+                                                <small class="text-muted">Precio Detal (USD):</small>
+                                                <p id="precioDetal" class="mb-2">-</p>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <small class="text-muted">Equivalencia:</small>
+                                                <p id="equivalencia" class="mb-2">-</p>
+                                            </div>
+                                            <div class="col-6">
+                                                <small class="text-muted">Stock Disponible:</small>
+                                                <p id="stockDisponible" class="mb-2">-</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Cantidad y Cálculos -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="cantidad" class="form-label">Cantidad *</label>
+                                    <input type="number" class="form-control" id="cantidad" name="cantidad" 
+                                           min="1" step="1" required placeholder="0">
+                                    <div class="form-text">
+                                        <span id="cantidadTexto">Ingrese la cantidad a vender</span>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="precio_unitario" class="form-label">Precio Unitario (USD)</label>
+                                    <input type="number" class="form-control" id="precio_unitario" name="precio_unitario" 
+                                           step="0.01" readonly>
+                                </div>
+                            </div>
+
+                            <!-- Resumen de la Venta -->
+                            <div class="col-md-6">
+                                <div class="card bg-success text-white">
+                                    <div class="card-header">
+                                        <h6 class="mb-0"><i class="fas fa-calculator"></i> Resumen de la Venta</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <small>Subtotal (USD):</small>
+                                                <h5 id="subtotalUSD">$0.00</h5>
+                                            </div>
+                                            <div class="col-6">
+                                                <small>IVA ({{ config.iva }}%):</small>
+                                                <h5 id="ivaUSD">$0.00</h5>
+                                            </div>
+                                        </div>
+                                        <hr class="my-2">
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <small>Total (USD):</small>
+                                                <h4 id="totalUSD">$0.00</h4>
+                                            </div>
+                                            <div class="col-6">
+                                                <small>Total (BS):</small>
+                                                <h4 id="totalBS">Bs 0.00</h4>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label for="observaciones" class="form-label">Observaciones</label>
+                                    <textarea class="form-control" id="observaciones" name="observaciones" 
+                                              rows="3" placeholder="Notas adicionales sobre la venta..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="button" class="btn btn-outline-secondary me-md-2" onclick="limpiarFormulario()">
+                                <i class="fas fa-eraser"></i> Limpiar
+                            </button>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-save"></i> Registrar Venta
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmación -->
+<div class="modal fade" id="confirmacionModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title"><i class="fas fa-check-circle"></i> Confirmar Venta</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Está seguro de que desea registrar esta venta?</p>
+                <div class="alert alert-info">
+                    <strong>Resumen:</strong><br>
+                    Producto: <span id="modalProducto">-</span><br>
+                    Cantidad: <span id="modalCantidad">-</span><br>
+                    Total: <span id="modalTotal">-</span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-success" onclick="confirmarVenta()">
+                    <i class="fas fa-check"></i> Confirmar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Datos de productos disponibles
+const productos = {{ productos|tojson }};
+const config = {{ config|tojson }};
+
+let productoSeleccionado = null;
+
+// Función para buscar producto por código
+function buscarProducto() {
+    const codigo = document.getElementById('codigo').value.trim();
+    if (!codigo) {
+        mostrarAlerta('Por favor ingrese un código de producto', 'warning');
+        return;
+    }
+
+    const producto = productos.find(p => p.codigo.toLowerCase() === codigo.toLowerCase());
+    if (producto) {
+        mostrarProducto(producto);
+    } else {
+        mostrarAlerta('Producto no encontrado', 'danger');
+        limpiarProducto();
+    }
+}
+
+// Función para mostrar información del producto
+function mostrarProducto(producto) {
+    productoSeleccionado = producto;
+    
+    document.getElementById('nombreProducto').textContent = producto.nombre;
+    document.getElementById('categoriaProducto').textContent = producto.categoria;
+    document.getElementById('precioMayor').textContent = `$${producto.precio_mayor_usd}`;
+    document.getElementById('precioDetal').textContent = `$${producto.precio_detal_usd}`;
+    document.getElementById('equivalencia').textContent = producto.equivalencia;
+    
+    // Calcular stock disponible
+    const stock = calcularStockDisponible(producto.codigo);
+    document.getElementById('stockDisponible').textContent = stock;
+    
+    // Actualizar precio unitario según tipo de venta
+    actualizarPrecioUnitario();
+}
+
+// Función para calcular stock disponible
+function calcularStockDisponible(codigo) {
+    // Esta función debería obtener el stock real desde el backend
+    // Por ahora retornamos un valor simulado
+    return "Disponible";
+}
+
+// Función para limpiar información del producto
+function limpiarProducto() {
+    productoSeleccionado = null;
+    document.getElementById('nombreProducto').textContent = '-';
+    document.getElementById('categoriaProducto').textContent = '-';
+    document.getElementById('precioMayor').textContent = '-';
+    document.getElementById('precioDetal').textContent = '-';
+    document.getElementById('equivalencia').textContent = '-';
+    document.getElementById('stockDisponible').textContent = '-';
+    document.getElementById('precio_unitario').value = '';
+    calcularTotales();
+}
+
+// Función para actualizar precio unitario
+function actualizarPrecioUnitario() {
+    if (!productoSeleccionado) return;
+    
+    const tipoVenta = document.getElementById('tipo_venta').value;
+    let precio = 0;
+    
+    if (tipoVenta === 'Mayor') {
+        precio = productoSeleccionado.precio_mayor_usd;
+    } else if (tipoVenta === 'Detal') {
+        precio = productoSeleccionado.precio_detal_usd;
+    }
+    
+    document.getElementById('precio_unitario').value = precio.toFixed(2);
+    calcularTotales();
+}
+
+// Función para calcular totales
+function calcularTotales() {
+    const cantidad = parseFloat(document.getElementById('cantidad').value) || 0;
+    const precioUnitario = parseFloat(document.getElementById('precio_unitario').value) || 0;
+    
+    const subtotal = cantidad * precioUnitario;
+    const iva = subtotal * (config.iva / 100);
+    const total = subtotal + iva;
+    const totalBS = total * config.tasa_cambio;
+    
+    document.getElementById('subtotalUSD').textContent = `$${subtotal.toFixed(2)}`;
+    document.getElementById('ivaUSD').textContent = `$${iva.toFixed(2)}`;
+    document.getElementById('totalUSD').textContent = `$${total.toFixed(2)}`;
+    document.getElementById('totalBS').textContent = `Bs ${totalBS.toFixed(2)}`;
+}
+
+// Función para actualizar texto de cantidad
+function actualizarCantidadTexto() {
+    const cantidad = document.getElementById('cantidad').value;
+    const tipoVenta = document.getElementById('tipo_venta').value;
+    const texto = document.getElementById('cantidadTexto');
+    
+    if (cantidad && tipoVenta && productoSeleccionado) {
+        if (tipoVenta === 'Mayor') {
+            texto.textContent = `${cantidad} unidades mayor`;
+        } else {
+            texto.textContent = `${cantidad} unidades detal`;
+        }
+    } else {
+        texto.textContent = 'Ingrese la cantidad a vender';
+    }
+}
+
+// Función para limpiar formulario
+function limpiarFormulario() {
+    document.getElementById('formVenta').reset();
+    limpiarProducto();
+    document.getElementById('fecha').value = '{{ today }}';
+}
+
+// Función para mostrar alerta
+function mostrarAlerta(mensaje, tipo) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${tipo} alert-dismissible fade show`;
+    alertDiv.innerHTML = `
+        ${mensaje}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    const container = document.querySelector('.container-fluid');
+    container.insertBefore(alertDiv, container.firstChild);
+    
+    setTimeout(() => {
+        alertDiv.remove();
+    }, 5000);
+}
+
+// Función para validar formulario
+function validarFormulario() {
+    if (!productoSeleccionado) {
+        mostrarAlerta('Debe seleccionar un producto', 'warning');
+        return false;
+    }
+    
+    const cantidad = parseFloat(document.getElementById('cantidad').value);
+    if (!cantidad || cantidad <= 0) {
+        mostrarAlerta('Debe ingresar una cantidad válida', 'warning');
+        return false;
+    }
+    
+    const tipoVenta = document.getElementById('tipo_venta').value;
+    if (!tipoVenta) {
+        mostrarAlerta('Debe seleccionar el tipo de venta', 'warning');
+        return false;
+    }
+    
+    return true;
+}
+
+// Función para confirmar venta
+function confirmarVenta() {
+    if (validarFormulario()) {
+        // Mostrar información en el modal
+        document.getElementById('modalProducto').textContent = productoSeleccionado.nombre;
+        document.getElementById('modalCantidad').textContent = document.getElementById('cantidad').value;
+        document.getElementById('modalTotal').textContent = document.getElementById('totalUSD').textContent;
+        
+        // Enviar formulario
+        document.getElementById('formVenta').submit();
+    }
+}
+
+// Event listeners
+document.addEventListener('DOMContentLoaded', function() {
+    // Buscar producto cuando se ingresa código
+    document.getElementById('codigo').addEventListener('input', function() {
+        const codigo = this.value.trim();
+        if (codigo) {
+            const producto = productos.find(p => p.codigo.toLowerCase() === codigo.toLowerCase());
+            if (producto) {
+                mostrarProducto(producto);
+            }
+        }
+    });
+    
+    // Actualizar precio cuando cambia tipo de venta
+    document.getElementById('tipo_venta').addEventListener('change', function() {
+        actualizarPrecioUnitario();
+        actualizarCantidadTexto();
+    });
+    
+    // Calcular totales cuando cambia cantidad
+    document.getElementById('cantidad').addEventListener('input', function() {
+        calcularTotales();
+        actualizarCantidadTexto();
+    });
+    
+    // Validar formulario antes de enviar
+    document.getElementById('formVenta').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        if (validarFormulario()) {
+            // Mostrar modal de confirmación
+            const modal = new bootstrap.Modal(document.getElementById('confirmacionModal'));
+            modal.show();
+        }
+    });
+    
+    // Ejemplo de producto para pruebas
+    if (productos.length > 0) {
+        document.getElementById('codigo').value = productos[0].codigo;
+        mostrarProducto(productos[0]);
+    }
+});
+</script>
+{% endblock %}

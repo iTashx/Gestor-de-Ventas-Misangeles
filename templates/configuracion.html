@@ -1,0 +1,487 @@
+{% extends "base.html" %}
+
+{% block title %}Configuración - Sistema Misangeles{% endblock %}
+{% block page_title %}Configuración del Sistema{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Configuración General -->
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="fas fa-cog"></i> Configuración General
+                </h5>
+            </div>
+            <div class="card-body">
+                <form id="configForm">
+                    <div class="mb-3">
+                        <label for="nombreEmpresa" class="form-label">Nombre de la Empresa</label>
+                        <input type="text" class="form-control" id="nombreEmpresa" value="Misangeles">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="tasaCambio" class="form-label">Tasa de Cambio USD/BS</label>
+                        <input type="number" class="form-control" id="tasaCambio" step="0.01" value="35.50">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="ivaPorcentaje" class="form-label">Porcentaje de IVA (%)</label>
+                        <input type="number" class="form-control" id="ivaPorcentaje" value="30">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="stockMinimo" class="form-label">Stock Mínimo</label>
+                        <input type="number" class="form-control" id="stockMinimo" value="10">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Guardar Configuración
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subida de Logo -->
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="fas fa-image"></i> Logo de la Empresa
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="logo-upload">
+                    <div id="logoPreview">
+                        <img src="{{ url_for('static', filename='img/logo.png') }}" 
+                             alt="Logo actual" 
+                             class="logo-preview"
+                             id="currentLogo"
+                             onerror="this.style.display='none'; document.getElementById('noLogo').style.display='block';">
+                        <div id="noLogo" style="display:none;" class="text-center">
+                            <i class="fas fa-image fa-3x text-muted mb-2"></i>
+                            <p class="text-muted">No hay logo configurado</p>
+                        </div>
+                    </div>
+                    
+                    <input type="file" 
+                           id="logoInput" 
+                           accept="image/*" 
+                           style="display: none;"
+                           onchange="previewLogo(this)">
+                    
+                    <button type="button" 
+                            class="logo-upload-btn" 
+                            onclick="document.getElementById('logoInput').click()">
+                        <i class="fas fa-upload"></i> Subir Nuevo Logo
+                    </button>
+                    
+                    <div class="mt-3">
+                        <small class="text-muted">
+                            Formatos soportados: JPG, PNG, SVG<br>
+                            Tamaño recomendado: 200x200 píxeles
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Información de la Empresa -->
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="fas fa-building"></i> Información de la Empresa
+                </h5>
+            </div>
+            <div class="card-body">
+                <form id="empresaForm">
+                    <div class="mb-3">
+                        <label for="slogan" class="form-label">Slogan</label>
+                        <input type="text" class="form-control" id="slogan" value="Gestionando tu negocio con excelencia">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email de Contacto</label>
+                        <input type="email" class="form-control" id="email" value="angeljrojasm@gmail.com">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="telefono" class="form-label">Teléfono</label>
+                        <input type="text" class="form-control" id="telefono" value="+58 123-456-7890">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="direccion" class="form-label">Dirección</label>
+                        <input type="text" class="form-control" id="direccion" value="Venezuela">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Guardar Información
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Personalización de Colores -->
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="fas fa-palette"></i> Personalización de Colores
+                </h5>
+            </div>
+            <div class="card-body">
+                <form id="coloresForm">
+                    <div class="mb-3">
+                        <label for="colorPrimario" class="form-label">Color Primario</label>
+                        <input type="color" class="form-control form-control-color" id="colorPrimario" value="#366092">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="colorSecundario" class="form-label">Color Secundario</label>
+                        <input type="color" class="form-control form-control-color" id="colorSecundario" value="#E7E6E6">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="colorExito" class="form-label">Color de Éxito</label>
+                        <input type="color" class="form-control form-control-color" id="colorExito" value="#00B050">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Aplicar Colores
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Acciones del Sistema -->
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="fas fa-tools"></i> Acciones del Sistema
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <button class="btn btn-outline-primary w-100" onclick="exportarConfiguracion()">
+                            <i class="fas fa-download"></i> Exportar Configuración
+                        </button>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <button class="btn btn-outline-success w-100" onclick="importarConfiguracion()">
+                            <i class="fas fa-upload"></i> Importar Configuración
+                        </button>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <button class="btn btn-outline-warning w-100" onclick="restaurarConfiguracion()">
+                            <i class="fas fa-undo"></i> Restaurar por Defecto
+                        </button>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <button class="btn btn-outline-info w-100" onclick="mostrarInfoSistema()">
+                            <i class="fas fa-info-circle"></i> Información del Sistema
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Input oculto para importar configuración -->
+<input type="file" id="importConfigInput" accept=".json" style="display: none;" onchange="procesarImportacion(this)">
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Función para previsualizar logo
+function previewLogo(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            const logoPreview = document.getElementById('logoPreview');
+            const noLogo = document.getElementById('noLogo');
+            
+            // Ocultar mensaje de no logo
+            noLogo.style.display = 'none';
+            
+            // Crear nueva imagen
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            img.className = 'logo-preview';
+            img.id = 'currentLogo';
+            
+            // Limpiar preview anterior
+            logoPreview.innerHTML = '';
+            logoPreview.appendChild(img);
+            
+            // Subir logo al servidor
+            subirLogo(input.files[0]);
+        };
+        
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+// Función para subir logo al servidor
+function subirLogo(file) {
+    const formData = new FormData();
+    formData.append('logo', file);
+    
+    fetch('/subir_logo', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            Swal.fire({
+                icon: 'success',
+                title: '¡Logo actualizado!',
+                text: 'El logo se ha actualizado correctamente',
+                confirmButtonColor: '#366092'
+            });
+            
+            // Actualizar logo en sidebar
+            actualizarLogoEnSistema(data.logo_url);
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: data.message || 'Error al subir el logo',
+                confirmButtonColor: '#366092'
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Error al subir el logo',
+            confirmButtonColor: '#366092'
+        });
+    });
+}
+
+// Función para actualizar logo en el sistema
+function actualizarLogoEnSistema(logoUrl) {
+    // Actualizar logo en sidebar
+    const sidebarLogo = document.querySelector('.sidebar-logo');
+    if (sidebarLogo) {
+        sidebarLogo.innerHTML = `<img src="${logoUrl}" alt="Logo" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+    }
+    
+    // Guardar en configuración local
+    if (window.SystemConfig) {
+        window.SystemConfig.set('empresa', 'logo', logoUrl);
+        window.SystemConfig.save();
+    }
+}
+
+// Función para exportar configuración
+function exportarConfiguracion() {
+    if (window.SystemConfig) {
+        window.SystemConfig.export();
+    }
+}
+
+// Función para importar configuración
+function importarConfiguracion() {
+    document.getElementById('importConfigInput').click();
+}
+
+// Función para procesar importación
+function procesarImportacion(input) {
+    if (input.files && input.files[0]) {
+        if (window.SystemConfig) {
+            window.SystemConfig.import(input.files[0])
+                .then(() => {
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Configuración importada!',
+                        text: 'La configuración se ha importado correctamente',
+                        confirmButtonColor: '#366092'
+                    }).then(() => {
+                        location.reload();
+                    });
+                })
+                .catch(error => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Error al importar la configuración',
+                        confirmButtonColor: '#366092'
+                    });
+                });
+        }
+    }
+}
+
+// Función para restaurar configuración
+function restaurarConfiguracion() {
+    Swal.fire({
+        title: '¿Estás seguro?',
+        text: "Esta acción restaurará la configuración por defecto y se perderán todos los cambios personalizados.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#366092',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, restaurar',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            if (window.SystemConfig) {
+                window.SystemConfig.restore();
+            }
+        }
+    });
+}
+
+// Función para mostrar información del sistema
+function mostrarInfoSistema() {
+    Swal.fire({
+        title: 'Información del Sistema',
+        html: `
+            <div class="text-center">
+                <h4><i class="fas fa-info-circle text-primary"></i> Sistema Misangeles</h4>
+                <p><strong>Versión:</strong> 2.0</p>
+                <p><strong>Desarrollado por:</strong> Angel Rojas</p>
+                <p><strong>Contacto:</strong> angeljrojasm@gmail.com</p>
+                <p><strong>Fecha:</strong> ${new Date().toLocaleDateString()}</p>
+                <p><strong>Funcionalidades:</strong> Gestión completa de inventario, ventas, entradas y reportes</p>
+            </div>
+        `,
+        icon: 'info',
+        confirmButtonText: 'Entendido',
+        confirmButtonColor: '#366092'
+    });
+}
+
+// Configurar formularios
+document.addEventListener('DOMContentLoaded', function() {
+    // Formulario de configuración general
+    document.getElementById('configForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const config = {
+            nombreEmpresa: document.getElementById('nombreEmpresa').value,
+            tasaCambio: parseFloat(document.getElementById('tasaCambio').value),
+            ivaPorcentaje: parseInt(document.getElementById('ivaPorcentaje').value),
+            stockMinimo: parseInt(document.getElementById('stockMinimo').value)
+        };
+        
+        // Guardar configuración
+        if (window.SystemConfig) {
+            window.SystemConfig.set('empresa', 'nombreComercial', config.nombreEmpresa);
+            window.SystemConfig.set('monedas', 'tasaCambio', config.tasaCambio);
+            window.SystemConfig.set('impuestos', 'ivaPorcentaje', config.ivaPorcentaje);
+            window.SystemConfig.set('inventario', 'stockMinimo', config.stockMinimo);
+            window.SystemConfig.save();
+        }
+        
+        Swal.fire({
+            icon: 'success',
+            title: '¡Configuración guardada!',
+            text: 'Los cambios se han aplicado correctamente',
+            confirmButtonColor: '#366092'
+        });
+    });
+    
+    // Formulario de información de empresa
+    document.getElementById('empresaForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const empresa = {
+            slogan: document.getElementById('slogan').value,
+            email: document.getElementById('email').value,
+            telefono: document.getElementById('telefono').value,
+            direccion: document.getElementById('direccion').value
+        };
+        
+        // Guardar información
+        if (window.SystemConfig) {
+            window.SystemConfig.set('empresa', 'slogan', empresa.slogan);
+            window.SystemConfig.set('empresa', 'email', empresa.email);
+            window.SystemConfig.set('empresa', 'telefono', empresa.telefono);
+            window.SystemConfig.set('empresa', 'direccion', empresa.direccion);
+            window.SystemConfig.save();
+        }
+        
+        Swal.fire({
+            icon: 'success',
+            title: '¡Información guardada!',
+            text: 'Los datos de la empresa se han actualizado',
+            confirmButtonColor: '#366092'
+        });
+    });
+    
+    // Formulario de colores
+    document.getElementById('coloresForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const colores = {
+            colorPrimario: document.getElementById('colorPrimario').value,
+            colorSecundario: document.getElementById('colorSecundario').value,
+            colorExito: document.getElementById('colorExito').value
+        };
+        
+        // Aplicar colores
+        if (window.SystemConfig) {
+            window.SystemConfig.set('sistema', 'colorPrimario', colores.colorPrimario);
+            window.SystemConfig.set('sistema', 'colorSecundario', colores.colorSecundario);
+            window.SystemConfig.set('sistema', 'colorExito', colores.colorExito);
+            window.SystemConfig.save();
+            window.SystemConfig.apply();
+        }
+        
+        Swal.fire({
+            icon: 'success',
+            title: '¡Colores aplicados!',
+            text: 'Los nuevos colores se han aplicado al sistema',
+            confirmButtonColor: '#366092'
+        });
+    });
+    
+    // Cargar configuración actual
+    if (window.SystemConfig) {
+        const config = window.SystemConfig.config;
+        
+        // Llenar formularios con configuración actual
+        if (config.empresa) {
+            document.getElementById('nombreEmpresa').value = config.empresa.nombreComercial || 'Misangeles';
+            document.getElementById('slogan').value = config.empresa.slogan || 'Gestionando tu negocio con excelencia';
+            document.getElementById('email').value = config.empresa.email || 'angeljrojasm@gmail.com';
+            document.getElementById('telefono').value = config.empresa.telefono || '+58 123-456-7890';
+            document.getElementById('direccion').value = config.empresa.direccion || 'Venezuela';
+        }
+        
+        if (config.monedas) {
+            document.getElementById('tasaCambio').value = config.monedas.tasaCambio || 35.50;
+        }
+        
+        if (config.impuestos) {
+            document.getElementById('ivaPorcentaje').value = config.impuestos.ivaPorcentaje || 30;
+        }
+        
+        if (config.inventario) {
+            document.getElementById('stockMinimo').value = config.inventario.stockMinimo || 10;
+        }
+        
+        if (config.sistema) {
+            document.getElementById('colorPrimario').value = config.sistema.colorPrimario || '#366092';
+            document.getElementById('colorSecundario').value = config.sistema.colorSecundario || '#E7E6E6';
+            document.getElementById('colorExito').value = config.sistema.colorExito || '#00B050';
+        }
+    }
+});
+</script>
+{% endblock %}

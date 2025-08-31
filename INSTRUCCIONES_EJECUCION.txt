@@ -1,0 +1,193 @@
+===============================================================================
+                    INSTRUCCIONES PARA EJECUTAR LA APP WEB
+                    SISTEMA DE GESTIÓN MIS ÁNGELES
+===============================================================================
+
+🎯 **¿QUÉ ES ESTA APLICACIÓN?**
+Esta es una aplicación web completa que reemplaza tu sistema Excel V70. Funciona en:
+- ✅ PC (navegador web)
+- ✅ Tablet (navegador web)
+- ✅ Celular (navegador web)
+- ✅ Cualquier dispositivo con internet
+
+🚀 **VENTAJAS DE LA APP WEB:**
+- No necesitas descargar nada en tu PC
+- Funciona en todos los dispositivos automáticamente
+- Fácil de mantener y actualizar
+- Acceso desde cualquier lugar con internet
+- No ocupa espacio en tu PC
+- Interfaz moderna y profesional
+
+===============================================================================
+📋 **PASOS PARA EJECUTAR LA APLICACIÓN**
+===============================================================================
+
+### PASO 1: INSTALAR PYTHON (si no lo tienes)
+1. Ve a https://www.python.org/downloads/
+2. Descarga Python 3.8 o superior
+3. Instala Python (marca "Add Python to PATH")
+4. Verifica la instalación: abre CMD y escribe `python --version`
+
+### PASO 2: INSTALAR DEPENDENCIAS
+1. Abre CMD o PowerShell
+2. Navega a la carpeta: `cd "D:\bodega de mama\inventario en app\app_web"`
+3. Instala las dependencias: `pip install -r requirements.txt`
+
+### PASO 3: EJECUTAR LA APLICACIÓN
+1. En la misma carpeta, ejecuta: `python run.py`
+2. Verás un mensaje: "🚀 INICIANDO SISTEMA DE GESTIÓN MIS ÁNGELES"
+3. La aplicación se iniciará en: http://localhost:5000
+
+### PASO 4: ACCEDER A LA APLICACIÓN
+1. Abre tu navegador web (Chrome, Firefox, Edge, etc.)
+2. Ve a: http://localhost:5000
+3. ¡Listo! Ya puedes usar la aplicación
+
+===============================================================================
+🖥️ **FUNCIONALIDADES DISPONIBLES**
+===============================================================================
+
+### 📊 DASHBOARD (Página Principal)
+- Resumen de ventas del día
+- Total de ventas en USD y BS
+- Tasa de cambio actual
+- Inventario con stock disponible
+- Accesos rápidos a funciones
+
+### 📦 PRODUCTOS
+- Lista de todos los productos
+- Búsqueda y filtros
+- Agregar nuevos productos
+- Editar productos existentes
+- Ver detalles completos
+
+### 📥 ENTRADAS DE INVENTARIO
+- Registrar nuevas entradas
+- Historial de entradas
+- Cálculos automáticos
+- Filtros por fecha y producto
+
+### 📤 VENTAS
+- Registrar nuevas ventas
+- Historial de ventas
+- Cálculo automático de IVA
+- Conversión USD a BS
+- Filtros y búsquedas
+
+### 📋 INVENTARIO
+- Stock actual de todos los productos
+- Valores en USD y BS
+- Estado de inventario
+- Alertas de stock bajo
+
+### 📈 REPORTES
+- Estadísticas de ventas
+- Exportar a Excel
+- Reportes por fecha
+- Resúmenes ejecutivos
+
+### ⚙️ CONFIGURACIÓN
+- Tasa de cambio USD/BS
+- Porcentaje de IVA
+- Nombre de la empresa
+- Fecha de referencia del dólar
+
+===============================================================================
+🔧 **CONFIGURACIÓN INICIAL**
+===============================================================================
+
+### PRIMERA VEZ QUE USES LA APP:
+1. Ve a "Configuración" en el menú
+2. Configura:
+   - Nombre de tu empresa
+   - Tasa de cambio USD/BS actual
+   - Porcentaje de IVA (30%)
+   - Fecha de referencia del dólar
+3. Guarda la configuración
+
+### AGREGAR PRODUCTOS:
+1. Ve a "Productos" → "Nuevo Producto"
+2. Completa:
+   - Código del producto
+   - Nombre
+   - Descripción
+   - Categoría
+   - Precio detal (USD)
+   - Precio mayor (USD)
+   - Equivalencia (ej: 30 unidades por cartón)
+3. Guarda el producto
+
+### REGISTRAR ENTRADAS:
+1. Ve a "Entradas" → "Nueva Entrada"
+2. Selecciona el producto por código
+3. Ingresa cantidad y tipo (Mayor/Detal)
+4. La fecha se llena automáticamente
+5. Guarda la entrada
+
+### REGISTRAR VENTAS:
+1. Ve a "Ventas" → "Nueva Venta"
+2. Ingresa el código del producto
+3. Selecciona tipo de venta (Mayor/Detal)
+4. Ingresa cantidad
+5. El sistema calcula automáticamente:
+   - Precio unitario
+   - Subtotal
+   - IVA
+   - Total en USD y BS
+6. Confirma la venta
+
+===============================================================================
+💡 **CONSEJOS DE USO**
+===============================================================================
+
+### PARA USO DIARIO:
+- Siempre verifica la tasa de cambio antes de registrar ventas
+- Usa códigos de productos consistentes
+- Registra entradas inmediatamente al recibir mercancía
+- Revisa el inventario regularmente
+
+### PARA REPORTES:
+- Los reportes se generan automáticamente
+- Puedes exportar datos a Excel
+- Las estadísticas se actualizan en tiempo real
+- Usa los filtros para ver datos específicos
+
+### PARA MANTENIMIENTO:
+- La base de datos se guarda automáticamente
+- No necesitas hacer copias de seguridad manuales
+- La aplicación es estable y confiable
+
+===============================================================================
+🚨 **SOLUCIÓN DE PROBLEMAS**
+===============================================================================
+
+### SI LA APP NO INICIA:
+1. Verifica que Python esté instalado: `python --version`
+2. Verifica que las dependencias estén instaladas: `pip list`
+3. Asegúrate de estar en la carpeta correcta
+4. Revisa que el puerto 5000 no esté ocupado
+
+### SI HAY ERRORES:
+1. Revisa los mensajes de error en la consola
+2. Verifica que la base de datos se haya creado
+3. Asegúrate de que todos los archivos estén presentes
+
+### SI NO PUEDES ACCEDER:
+1. Verifica que la URL sea: http://localhost:5000
+2. Asegúrate de que el navegador esté actualizado
+3. Intenta con otro navegador
+
+### PARA DETENER LA APP:
+- Presiona Ctrl+C en la consola donde está ejecutándose
+
+===============================================================================
+📞 **SOPORTE**
+===============================================================================
+
+Si tienes problemas:
+1. Revisa estas instrucciones
+2. Verifica que sigas todos los pasos
+3. La aplicación es intuitiva y fácil de usar
+4. Todos los cálculos son automáticos
+
+¡La aplicación está lista para usar! 🎉
